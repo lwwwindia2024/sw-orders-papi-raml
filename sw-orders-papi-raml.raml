@@ -1,2 +1,80 @@
 #%RAML 1.0
-title: sw-orders-papi-raml
+title: swiggy-orders-papi
+baseUri: http://localhost:9094
+mediaType: 
+- application/json
+
+types:
+  CreateOrderRequest: !include datatypes/CreateOrderRequest.raml
+  CreateOrderResponse: !include datatypes/CreateOrderResponse.raml
+  CustomErrorMessage: !include datatypes/CustomErrorMessage.raml
+  GetOrderResponse: !include datatypes/GetOrderResponse.raml
+  OrderItemDetails: !include datatypes/OrderItemDetails.raml
+
+resourceTypes:
+  collection: !include resourceTypes/collection.raml
+
+/orders:
+  type: collection    
+  post:
+   responses:
+     404:
+      body:
+        application/json:
+          type: CustomErrorMessage
+          example:
+            {
+              "statusCode": "404",
+              "message": "customer/menuitem/restaurant doesn't exist'"
+            }
+     409:
+      body:   
+        description:  "If all order items doesnot belong to same restaurant, implementation has to return error message  
+                      All OrderItems in Order doesnot belong to Same Restaurant!! "     
+        type: CustomErrorMessage
+        example:
+            {
+                "statusCode": "409",          
+                "message": "All OrderItems in Order doesnot belong to Same Restaurant!!"
+              }
+     500:
+      body:
+        description:  "If quantity in Inventory is not sufficient for this order, error message must be Quantity insufficient for Order Item
+                       else  There was some server side problem. Please try later"
+        type: CustomErrorMessage
+        example:
+            {
+                "statusCode": "500",          
+                "message": "Quantity insufficient for Order Item /There was some server side problem. Please try later"
+              }
+              
+  /{id}:
+    get:
+      responses:
+        200:
+          body:
+            type: GetOrderResponse
+        404:
+            body:
+              type: CustomErrorMessage
+              example:
+                {
+                  "statusCode": "404",
+                  "message": "Order with given id doesn't exist'"
+                }   
+            
+    /orderItems:
+      get:
+        responses:          
+          200:
+           body:
+             type: OrderItemDetails 
+          404:
+            body:
+              type: CustomErrorMessage
+              example:
+                {
+                  "statusCode": "404",
+                  "message": "Order with given id doesn't exist'"
+                }
+                
