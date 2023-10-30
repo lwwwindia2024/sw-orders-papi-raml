@@ -8,6 +8,8 @@ types:
   CreateOrderRequest: !include datatypes/CreateOrderRequest.raml
   CreateOrderResponse: !include datatypes/CreateOrderResponse.raml
   CustomErrorMessage: !include datatypes/CustomErrorMessage.raml
+  GetOrderResponse: !include datatypes/GetOrderResponse.raml
+  OrderItemDetails: !include datatypes/OrderItemDetails.raml
 
 resourceTypes:
   collection: !include resourceTypes/collection.raml
@@ -45,3 +47,34 @@ resourceTypes:
                 "statusCode": "500",          
                 "message": "Quantity insufficient for Order Item /There was some server side problem. Please try later"
               }
+              
+  /{id}:
+    get:
+      responses:
+        200:
+          body:
+            type: GetOrderResponse
+        404:
+            body:
+              type: CustomErrorMessage
+              example:
+                {
+                  "statusCode": "404",
+                  "message": "Order with given id doesn't exist'"
+                }   
+            
+    /orderItems:
+      get:
+        responses:          
+          200:
+           body:
+             type: OrderItemDetails 
+          404:
+            body:
+              type: CustomErrorMessage
+              example:
+                {
+                  "statusCode": "404",
+                  "message": "Order with given id doesn't exist'"
+                }
+                
